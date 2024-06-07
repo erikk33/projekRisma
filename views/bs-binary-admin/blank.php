@@ -9,6 +9,13 @@ if (!isset($_SESSION['username'])) {
     header('Location: ../../index.php?page=login');
     exit();
 }
+
+// Memeriksa role admin dengan menggunakan 1 username risma
+if ($_SESSION['username'] === 'risma') {
+    // Jika role adalah user, lempar kembali ke halaman blank.php
+    header('Location: blank-admin.php');
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -35,11 +42,11 @@ if (!isset($_SESSION['username'])) {
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.html">Binary admin</a> 
+                <a class="navbar-brand" href="index.php">Binary admin</a> 
             </div>
             <div style="color: white; padding: 15px 50px 5px 50px; float: right; font-size: 16px;">
-                Last access : <?php echo date('d M Y'); ?> &nbsp; 
-                <a href="../logout.php" class="btn btn-danger square-btn-adjust">Logout</a>
+               
+                <a href="../../index.php?page=logout" class="btn btn-danger square-btn-adjust">Logout</a>
             </div>
         </nav>   
         <!-- /. NAV TOP  -->
@@ -47,53 +54,20 @@ if (!isset($_SESSION['username'])) {
             <div class="sidebar-collapse">
                 <ul class="nav" id="main-menu">
                     <li class="text-center">
-                        <img src="assets/img/find_user.png" class="user-image img-responsive"/>
+                        <img src="assets/img/find_userb.png" class="user-image img-responsive"/>
                     </li>
                     <li>
-                        <a href="index.html"><i class="fa fa-dashboard fa-3x"></i> Dashboard</a>
+                        <a href="index.php"><i class="fa fa-dashboard fa-3x"></i> Dashboard</a>
                     </li>
+                    
+                   
                     <li>
-                        <a href="ui.html"><i class="fa fa-desktop fa-3x"></i> UI Elements</a>
+                        <a href="table-user.php"><i class="fa fa-table fa-3x"></i> Table Data Penduduk</a>
                     </li>
+                                 
+                  
                     <li>
-                        <a href="tab-panel.html"><i class="fa fa-qrcode fa-3x"></i> Tabs & Panels</a>
-                    </li>
-                    <li>
-                        <a href="chart.html"><i class="fa fa-bar-chart-o fa-3x"></i> Morris Charts</a>
-                    </li>   
-                    <li>
-                        <a href="table.html"><i class="fa fa-table fa-3x"></i> Table Examples</a>
-                    </li>
-                    <li>
-                        <a href="form.html"><i class="fa fa-edit fa-3x"></i> Forms </a>
-                    </li>               
-                    <li>
-                        <a href="#"><i class="fa fa-sitemap fa-3x"></i> Multi-Level Dropdown<span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level">
-                            <li>
-                                <a href="#">Second Level Link</a>
-                            </li>
-                            <li>
-                                <a href="#">Second Level Link</a>
-                            </li>
-                            <li>
-                                <a href="#">Second Level Link<span class="fa arrow"></span></a>
-                                <ul class="nav nav-third-level">
-                                    <li>
-                                        <a href="#">Third Level Link</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Third Level Link</a>
-                                    </li>
-                                    <li>
-                                        <a href="#">Third Level Link</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
-                    </li>  
-                    <li>
-                        <a class="active-menu" href="blank.html"><i class="fa fa-square-o fa-3x"></i> Blank Page</a>
+                        <a class="active-menu" href="blank.php"><i class="fa fa-square-o fa-3x"></i> Blank Page</a>
                     </li>   
                 </ul>
             </div>
@@ -102,11 +76,11 @@ if (!isset($_SESSION['username'])) {
         <div id="page-wrapper">
             <div id="page-inner">
                 <div class="row">
-                <div class="col-md-12">
-        <h2>Blank Page</h2>   
-        <!-- Menampilkan nama pengguna dari session -->
-        <h5>Welcome <?php echo $_SESSION['username']; ?>, Love to see you back. </h5>
-    </div>
+                    <div class="col-md-12">
+                        <h2>Blank Page</h2>   
+                        <!-- Menampilkan nama pengguna dari session -->
+                        <h5>Welcome <?php echo $_SESSION['username']; ?>, Love to see you back. </h5>
+                    </div>
                 </div>
                 <!-- /. ROW  -->
                 <hr />

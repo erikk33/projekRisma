@@ -1,29 +1,17 @@
-﻿<?php
-// blank.php
-
-// Memulai session
-session_start();
-// Memeriksa apakah session username sudah diset
-if (!isset($_SESSION['username'])) {
-    // Jika tidak, redirect ke halaman login
-    header('Location: ../../index.php?page=login');
-    exit();
-}
-
-// Memeriksa role
-if ($_SESSION['role'] === 'user') {
-    // Jika role adalah user, lempar kembali ke halaman blank.php
-    header('Location: blank.php');
-    exit();
-}
-?>
 <?php
-require_once 'database/database.php';
-require_once 'page.php';
+session_start();
+require_once 'database/databaseUser.php';
+require_once 'page-user.php';
+
+// Check if the user is logged in and has the 'user' role
+if (!isset($_SESSION['username']) || $_SESSION['role'] !== 'user') {
+    header('Location: login.php');
+    exit();
+}
 
 // Initialize objects
 $db = new Database();
-$page = new Page("Admin Table - Projek Penduduk");
+$page = new Page("User Table - Projek Penduduk", "table-user");
 
 $page->renderHeader();
 
@@ -37,24 +25,8 @@ if (isset($_POST['update'])) {
     $id_daerah = $_POST['id_daerah'];
     $db->updateData($nik, $nama, $alamat, $tanggal_lahir, $jenis_kelamin, $id_daerah);
 }
-
-// Handle delete request
-if (isset($_POST['delete'])) {
-    $nik = $_POST['nik'];
-    $db->deleteData($nik);
-}
-
-// Handle add request
-if (isset($_POST['add'])) {
-    $nik = $_POST['nik'];
-    $nama = $_POST['nama'];
-    $alamat = $_POST['alamat'];
-    $tanggal_lahir = $_POST['tanggal_lahir'];
-    $jenis_kelamin = $_POST['jenis_kelamin'];
-    $id_daerah = $_POST['id_daerah'];
-    $db->addData($nik, $nama, $alamat, $tanggal_lahir, $jenis_kelamin, $id_daerah);
-}
 ?>
+
 <style>
 .fixed {
     position: fixed;
@@ -98,14 +70,13 @@ if (isset($_POST['add'])) {
     <div id="page-inner" class="container mx-auto p-4">
         <div class="row">
             <div class="col-md-12">
-                <h2 class="text-2xl font-bold">Table admin Penduduk</h2>   
-                <h5>Welcome Jhon Deo, Love to see you back.</h5>
+                <h2 class="text-2xl font-bold">User Table Penduduk</h2>   
+                <h5>Welcome <?php echo $_SESSION['username']; ?>, Love to see you back.</h5>
             </div>
         </div>
         <hr />
         <div class="row">
             <div class="col-md-12">
-                <button class='bg-green-500 text-white px-3 py-2 rounded mb-4' onclick="document.getElementById('addModal').style.display='block'">Add New</button>
                 <!-- Responsive Table -->
                 <div class="bg-white shadow-md rounded my-6">
                     <table class="min-w-max w-full table-auto">
@@ -122,7 +93,8 @@ if (isset($_POST['add'])) {
                         </thead>
                         <tbody class="text-gray-600 text-sm font-light">
                             <?php
-                            $result = $db->getData();
+                            $username = $_SESSION['username'];
+                            $result = $db->getDataByUsername($username);
                             if ($result->num_rows > 0) {
                                 while($row = $result->fetch_assoc()) {
                                     echo "<tr class='border-b border-gray-200 hover:bg-gray-100'>";
@@ -133,11 +105,7 @@ if (isset($_POST['add'])) {
                                     echo "<td class='py-3 px-6 text-left'>" . $row["jenis_kelamin"]. "</td>";
                                     echo "<td class='py-3 px-6 text-left'>" . $row["id_daerah"]. "</td>";
                                     echo "<td class='py-3 px-6 text-left'>";
-                                    echo "<button class='bg-blue-500 text-white px-3 py-1 rounded mr-2' onclick=\"document.getElementById('editModal-{$row['nik']}').style.display='block'\">Edit</button>";
-                                    echo "<form style='display:inline;' method='POST'>";
-                                    echo "<input type='hidden' name='nik' value='{$row['nik']}'>";
-                                    echo "<button type='submit' name='delete' class='bg-red-500 text-white px-3 py-1 rounded'>Delete</button>";
-                                    echo "</form>";
+                                    echo "<button class='bg-blue-500 text-white px-3 py-1 rounded' onclick=\"document.getElementById('editModal-{$row['nik']}').style.display='block'\">Edit</button>";
                                     echo "</td>";
                                     echo "</tr>";
 
@@ -192,48 +160,6 @@ if (isset($_POST['add'])) {
                 </div>
                 <!-- End Responsive Table -->
             </div>
-        </div>
-    </div>
-</div>
-
-<!-- Add Modal -->
-<div id='addModal' class='fixed z-10 inset-0 overflow-y-auto' style='display:none;'>
-    <div class='flex items-center justify-center min-h-screen'>
-        <div class='bg-white p-5 rounded shadow-lg'>
-            <h2 class='text-2xl mb-4'>Add New Data</h2>
-            <form method='POST'>
-                <div class='mb-4'>
-                    <label class='block'>NIK:</label>
-                    <input type='text' name='nik' class='w-full p-2 border rounded'>
-                </div>
-                <div class='mb-4'>
-                    <label class='block'>Name:</label>
-                    <input type='text' name='nama' class='w-full p-2 border rounded'>
-                </div>
-                <div class='mb-4'>
-                    <label class='block'>Address:</label>
-                    <input type='text' name='alamat' class='w-full p-2 border rounded'>
-                </div>
-                <div class='mb-4'>
-                    <label class='block'>Date of Birth:</label>
-                    <input type='date' name='tanggal_lahir' class='w-full p-2 border rounded'>
-                </div>
-                <div class='mb-4'>
-                    <label class='block'>Gender:</label>
-                    <select name='jenis_kelamin' class='w-full p-2 border rounded'>
-                        <option value='L'>L</option>
-                        <option value='P'>P</option>
-                    </select>
-                </div>
-                <div class='mb-4'>
-                    <label class='block'>Region ID:</label>
-                    <input type='text' name='id_daerah' class='w-full p-2 border rounded'>
-                </div>
-                <div class='flex justify-end'>
-                    <button type='button' onclick="document.getElementById('addModal').style.display='none'" class='bg-gray-500 text-white px-3 py-1 rounded mr-2'>Cancel</button>
-                    <button type='submit' name='add' class='bg-green-500 text-white px-3 py-1 rounded'>Add</button>
-                </div>
-            </form>
         </div>
     </div>
 </div>

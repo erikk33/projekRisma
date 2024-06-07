@@ -7,6 +7,7 @@ require 'config/database.php';
 // Load the controllers
 require 'controllers/UserController.php';
 
+
 $controller = new UserController();
 
 $page = $_GET['page'] ?? 'login';
@@ -18,12 +19,11 @@ switch ($page) {
     case 'login':
         $controller->showLogin();
         break;
+    
     case 'logout':
-        $controller->logout(); // Panggil metode logout dari UserController
+        $controller->logout();
         break;
     default:
-        // Jika $_GET['page'] tidak sesuai dengan yang diharapkan,
-        // arahkan pengguna ke halaman login sebagai default.
         $controller->showLogin();
         break;
 }

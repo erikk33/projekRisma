@@ -18,41 +18,38 @@ if ($_SESSION['role'] === 'user') {
 }
 ?>
 <?php
-require_once 'database/database.php';
+require_once 'database/databaseAkunadmin.php';
 require_once 'page.php';
 
 // Initialize objects
 $db = new Database();
-$page = new Page("Admin Table - Projek Penduduk");
+$page = new Page("Admin Account Table - Projek Penduduk");
 
 $page->renderHeader();
 
 // Handle update request
 if (isset($_POST['update'])) {
+    $id = $_POST['id'];
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $role = $_POST['role'];
     $nik = $_POST['nik'];
-    $nama = $_POST['nama'];
-    $alamat = $_POST['alamat'];
-    $tanggal_lahir = $_POST['tanggal_lahir'];
-    $jenis_kelamin = $_POST['jenis_kelamin'];
-    $id_daerah = $_POST['id_daerah'];
-    $db->updateData($nik, $nama, $alamat, $tanggal_lahir, $jenis_kelamin, $id_daerah);
+    $db->updateUser($id, $username, $password, $role, $nik);
 }
 
 // Handle delete request
 if (isset($_POST['delete'])) {
-    $nik = $_POST['nik'];
-    $db->deleteData($nik);
+    $id = $_POST['id'];
+    $db->deleteUser($id);
 }
 
 // Handle add request
 if (isset($_POST['add'])) {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $role = $_POST['role'];
     $nik = $_POST['nik'];
-    $nama = $_POST['nama'];
-    $alamat = $_POST['alamat'];
-    $tanggal_lahir = $_POST['tanggal_lahir'];
-    $jenis_kelamin = $_POST['jenis_kelamin'];
-    $id_daerah = $_POST['id_daerah'];
-    $db->addData($nik, $nama, $alamat, $tanggal_lahir, $jenis_kelamin, $id_daerah);
+    $db->addUser($username, $password, $role, $nik);
 }
 ?>
 <style>
@@ -98,7 +95,7 @@ if (isset($_POST['add'])) {
     <div id="page-inner" class="container mx-auto p-4">
         <div class="row">
             <div class="col-md-12">
-                <h2 class="text-2xl font-bold">Table admin Penduduk</h2>   
+                <h2 class="text-2xl font-bold">Table Akun Admin</h2>   
                 <h5>Welcome Jhon Deo, Love to see you back.</h5>
             </div>
         </div>
@@ -111,31 +108,29 @@ if (isset($_POST['add'])) {
                     <table class="min-w-max w-full table-auto">
                         <thead>
                             <tr class="bg-gray-200 text-gray-600 uppercase text-sm leading-normal">
+                                <th class="py-3 px-6 text-left">ID</th>
+                                <th class="py-3 px-6 text-left">Username</th>
+                                <th class="py-3 px-6 text-left">Password</th>
+                                <th class="py-3 px-6 text-left">Role</th>
                                 <th class="py-3 px-6 text-left">NIK</th>
-                                <th class="py-3 px-6 text-left">Name</th>
-                                <th class="py-3 px-6 text-left">Address</th>
-                                <th class="py-3 px-6 text-left">Date of Birth</th>
-                                <th class="py-3 px-6 text-left">Gender</th>
-                                <th class="py-3 px-6 text-left">Region ID</th>
                                 <th class="py-3 px-6 text-left">Actions</th>
                             </tr>
                         </thead>
                         <tbody class="text-gray-600 text-sm font-light">
                             <?php
-                            $result = $db->getData();
+                            $result = $db->getUsers();
                             if ($result->num_rows > 0) {
                                 while($row = $result->fetch_assoc()) {
                                     echo "<tr class='border-b border-gray-200 hover:bg-gray-100'>";
-                                    echo "<td class='py-3 px-6 text-left whitespace-nowrap'>" . $row["nik"]. "</td>";
-                                    echo "<td class='py-3 px-6 text-left'>" . $row["nama"]. "</td>";
-                                    echo "<td class='py-3 px-6 text-left'>" . $row["alamat"]. "</td>";
-                                    echo "<td class='py-3 px-6 text-left'>" . $row["tanggal_lahir"]. "</td>";
-                                    echo "<td class='py-3 px-6 text-left'>" . $row["jenis_kelamin"]. "</td>";
-                                    echo "<td class='py-3 px-6 text-left'>" . $row["id_daerah"]. "</td>";
+                                    echo "<td class='py-3 px-6 text-left whitespace-nowrap'>" . $row["id"]. "</td>";
+                                    echo "<td class='py-3 px-6 text-left'>" . $row["username"]. "</td>";
+                                    echo "<td class='py-3 px-6 text-left'>" . $row["password"]. "</td>";
+                                    echo "<td class='py-3 px-6 text-left'>" . $row["role"]. "</td>";
+                                    echo "<td class='py-3 px-6 text-left'>" . $row["nik"]. "</td>";
                                     echo "<td class='py-3 px-6 text-left'>";
-                                    echo "<button class='bg-blue-500 text-white px-3 py-1 rounded mr-2' onclick=\"document.getElementById('editModal-{$row['nik']}').style.display='block'\">Edit</button>";
+                                    echo "<button class='bg-blue-500 text-white px-3 py-1 rounded mr-2' onclick=\"document.getElementById('editModal-{$row['id']}').style.display='block'\">Edit</button>";
                                     echo "<form style='display:inline;' method='POST'>";
-                                    echo "<input type='hidden' name='nik' value='{$row['nik']}'>";
+                                    echo "<input type='hidden' name='id' value='{$row['id']}'>";
                                     echo "<button type='submit' name='delete' class='bg-red-500 text-white px-3 py-1 rounded'>Delete</button>";
                                     echo "</form>";
                                     echo "</td>";
@@ -143,37 +138,33 @@ if (isset($_POST['add'])) {
 
                                     // Edit Modal
                                     echo "
-                                    <div id='editModal-{$row['nik']}' class='fixed z-10 inset-0 overflow-y-auto' style='display:none;'>
+                                    <div id='editModal-{$row['id']}' class='fixed z-10 inset-0 overflow-y-auto' style='display:none;'>
                                         <div class='flex items-center justify-center min-h-screen'>
                                             <div class='bg-white p-5 rounded shadow-lg'>
                                                 <h2 class='text-2xl mb-4'>Edit Data</h2>
                                                 <form method='POST'>
-                                                    <input type='hidden' name='nik' value='{$row['nik']}'>
+                                                    <input type='hidden' name='id' value='{$row['id']}'>
                                                     <div class='mb-4'>
-                                                        <label class='block'>Name:</label>
-                                                        <input type='text' name='nama' value='{$row['nama']}' class='w-full p-2 border rounded'>
+                                                        <label class='block'>Username:</label>
+                                                        <input type='text' name='username' value='{$row['username']}' class='w-full p-2 border rounded'>
                                                     </div>
                                                     <div class='mb-4'>
-                                                        <label class='block'>Address:</label>
-                                                        <input type='text' name='alamat' value='{$row['alamat']}' class='w-full p-2 border rounded'>
+                                                        <label class='block'>Password:</label>
+                                                        <input type='text' name='password' value='{$row['password']}' class='w-full p-2 border rounded'>
                                                     </div>
                                                     <div class='mb-4'>
-                                                        <label class='block'>Date of Birth:</label>
-                                                        <input type='date' name='tanggal_lahir' value='{$row['tanggal_lahir']}' class='w-full p-2 border rounded'>
-                                                    </div>
-                                                    <div class='mb-4'>
-                                                        <label class='block'>Gender:</label>
-                                                        <select name='jenis_kelamin' class='w-full p-2 border rounded'>
-                                                            <option value='L' " . ($row['jenis_kelamin'] == 'L' ? 'selected' : '') . ">L</option>
-                                                            <option value='P' " . ($row['jenis_kelamin'] == 'P' ? 'selected' : '') . ">P</option>
+                                                        <label class='block'>Role:</label>
+                                                        <select name='role' class='w-full p-2 border rounded'>
+                                                            <option value='admin' " . ($row['role'] == 'admin' ? 'selected' : '') . ">Admin</option>
+                                                            <option value='user' " . ($row['role'] == 'user' ? 'selected' : '') . ">User</option>
                                                         </select>
                                                     </div>
                                                     <div class='mb-4'>
-                                                        <label class='block'>Region ID:</label>
-                                                        <input type='text' name='id_daerah' value='{$row['id_daerah']}' class='w-full p-2 border rounded'>
+                                                        <label class='block'>NIK:</label>
+                                                        <input type='text' name='nik' value='{$row['nik']}' class='w-full p-2 border rounded'>
                                                     </div>
                                                     <div class='flex justify-end'>
-                                                        <button type='button' onclick=\"document.getElementById('editModal-{$row['nik']}').style.display='none'\" class='bg-gray-500 text-white px-3 py-1 rounded mr-2'>Cancel</button>
+                                                        <button type='button' onclick=\"document.getElementById('editModal-{$row['id']}').style.display='none'\" class='bg-gray-500 text-white px-3 py-1 rounded mr-2'>Cancel</button>
                                                         <button type='submit' name='update' class='bg-blue-500 text-white px-3 py-1 rounded'>Update</button>
                                                     </div>
                                                 </form>
@@ -203,31 +194,23 @@ if (isset($_POST['add'])) {
             <h2 class='text-2xl mb-4'>Add New Data</h2>
             <form method='POST'>
                 <div class='mb-4'>
-                    <label class='block'>NIK:</label>
-                    <input type='text' name='nik' class='w-full p-2 border rounded'>
+                    <label class='block'>Username:</label>
+                    <input type='text' name='username' class='w-full p-2 border rounded'>
                 </div>
                 <div class='mb-4'>
-                    <label class='block'>Name:</label>
-                    <input type='text' name='nama' class='w-full p-2 border rounded'>
+                    <label class='block'>Password:</label>
+                    <input type='text' name='password' class='w-full p-2 border rounded'>
                 </div>
                 <div class='mb-4'>
-                    <label class='block'>Address:</label>
-                    <input type='text' name='alamat' class='w-full p-2 border rounded'>
-                </div>
-                <div class='mb-4'>
-                    <label class='block'>Date of Birth:</label>
-                    <input type='date' name='tanggal_lahir' class='w-full p-2 border rounded'>
-                </div>
-                <div class='mb-4'>
-                    <label class='block'>Gender:</label>
-                    <select name='jenis_kelamin' class='w-full p-2 border rounded'>
-                        <option value='L'>L</option>
-                        <option value='P'>P</option>
+                    <label class='block'>Role:</label>
+                    <select name='role' class='w-full p-2 border rounded'>
+                        <option value='admin'>Admin</option>
+                        <option value='user'>User</option>
                     </select>
                 </div>
                 <div class='mb-4'>
-                    <label class='block'>Region ID:</label>
-                    <input type='text' name='id_daerah' class='w-full p-2 border rounded'>
+                    <label class='block'>NIK:</label>
+                    <input type='text' name='nik' class='w-full p-2 border rounded'>
                 </div>
                 <div class='flex justify-end'>
                     <button type='button' onclick="document.getElementById('addModal').style.display='none'" class='bg-gray-500 text-white px-3 py-1 rounded mr-2'>Cancel</button>
