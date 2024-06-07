@@ -3,6 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Glassmorphism Login</title>
-  <link rel="stylesheet" href="/app/Views/css/style.css">
+  <link rel="stylesheet" href="public/css/style.css">
 </head>
 <body>

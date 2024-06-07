@@ -1,20 +1,16 @@
 <?php
-class Database {
-    private $host = 'localhost';
-    private $db_name = 'projekpenduduk';
-    private $username = 'root';
-    private $password = '';
-    public $conn;
+error_reporting(E_ALL);
+ini_set('display_errors', 1);
 
-    public function getConnection() {
-        $this->conn = null;
-        try {
-            $this->conn = new PDO("mysql:host=" . $this->host . ";dbname=" . $this->db_name, $this->username, $this->password);
-            $this->conn->exec("set names utf8");
-        } catch(PDOException $exception) {
-            echo "Connection error: " . $exception->getMessage();
-        }
-        return $this->conn;
-    }
+$host = 'localhost';
+$dbname = 'projekpenduduk';
+$username = 'root';
+$password = '';
+
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8mb4", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    echo 'Connection failed: ' . $e->getMessage();
 }
 ?>
